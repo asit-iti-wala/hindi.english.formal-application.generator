@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formal Application Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --black: #000000; --white: #ffffff; --grey: #f2f2f2; }
+        body { font-family: 'Barlow Condensed', sans-serif; background-color: var(--white); color: var(--black); margin: 0; padding: 20px; text-transform: uppercase; }
+        .container { max-width: 600px; margin: auto; border: 2px solid var(--black); padding: 30px; }
+        h2 { border-bottom: 4px solid var(--black); padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 5px; }
+        input, select, textarea { border: 1px solid var(--black); padding: 10px; font-family: 'Barlow Condensed'; font-size: 1.1rem; }
+        button { background: var(--black); color: var(--white); border: none; padding: 15px; cursor: pointer; font-family: 'Barlow Condensed'; font-weight: bold; margin-top: 10px; }
+        button:hover { background: #333; }
+        #previewBox { display: none; margin-top: 20px; border-top: 2px dashed var(--black); padding-top: 20px; }
+        .application-sheet { border: 1px solid #ccc; padding: 40px; background: white; color: black; text-transform: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Application Maker</h2>
+    
+    <div class="form-group">
+        <label>Select Language</label>
+        <select id="lang">
+            <option value="English">English</option>
+            <option value="Hindi">Hindi</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Institution/College Name</label>
+        <input type="text" id="instName" list="inst-suggestions" placeholder="Type name...">
+        <datalist id="inst-suggestions">
+            <option value="Government ITI">
+            <option value="National Institute of Technology">
+            <option value="Global Public School">
+        </datalist>
+    </div>
+
+    <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="address">
+    </div>
+
+    <div class="form-group">
+        <label>State</label>
+        <select id="state">
+            <option value="Delhi">Delhi</option>
+            <option value="Uttar Pradesh">Uttar Pradesh</option>
+            <option value="Maharashtra">Maharashtra</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Reason (Max 15 Words)</label>
+        <textarea id="reason" rows="2" maxlength="100"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Student Name</label>
+        <input type="text" id="studentName">
+    </div>
+
+    <div class="form-group">
+        <label>Trade</label>
+        <select id="trade">
+            <option value="Electrician">Electrician</option>
+            <option value="Motor Mechanic">Motor Mechanic</option>
+            <option value="Fitter">Fitter</option>
+            <option value="Machinist">Machinist</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="appDate">
+    </div>
+
+    <button onclick="generatePreview()">CREATE APPLICATION</button>
+
+    <div id="previewBox">
+        <h3>Preview</h3>
+        <div id="appContent" class="application-sheet"></div>
+        <button onclick="downloadPDF()" style="width:100%; background: #000;">DOWNLOAD PDF</button>
+    </div>
+</div>
+
+<script>
+    function generatePreview() {
+        const lang = document.getElementById('lang').value;
+        const inst = document.getElementById('instName').value;
+        const addr = document.getElementById('address').value;
+        const reason = document.getElementById('reason').value;
+        const name = document.getElementById('studentName').value;
+        const trade = document.getElementById('trade').value;
+        const date = document.getElementById('appDate').value;
+
+        let template = "";
+
+        if(lang === "English") {
+            template = `
+                <b>To,</b><br>The Principal,<br>${inst},<br>${addr}.<br><br>
+                <b>Date:</b> ${date}<br><br>
+                <b>Subject: Application regarding ${reason}</b><br><br>
+                Respected Sir/Ma'am,<br>
+                I am ${name}, a student of ${trade} trade. I am writing this application because ${reason}.<br><br>
+                Yours Sincerely,<br>${name}<br>Trade: ${trade}
+            `;
+        } else {
+            template = `
+                <b>सेवा में,</b><br>प्रधानाचार्य महोदय,<br>${inst},<br>${addr}।<br><br>
+                <b>दिनांक:</b> ${date}<br><br>
+                <b>विषय: ${reason} हेतु प्रार्थना पत्र</b><br><br>
+                आदरणीय महोदय/महोदया,<br>
+                सविनय निवेदन है कि मैं ${name}, ${trade} ट्रेड का छात्र हूँ। मैं यह आवेदन ${reason} के कारण लिख रहा हूँ।<br><br>
+                आपका आज्ञाकारी,<br>${name}<br>ट्रेड: ${trade}
+            `;
+        }
+
+        document.getElementById('appContent').innerHTML = template;
+        document.getElementById('previewBox').style.display = 'block';
+    }
+
+    async function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const content = document.getElementById('appContent').innerText;
+        
+        doc.setFont("helvetica");
+        doc.setFontSize(12);
+        doc.text(content, 10, 10, { maxWidth: 180 });
+        doc.save("Application.pdf");
+    }
+</script>
+
+</body>
+</html>
